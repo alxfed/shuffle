@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>First Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #message { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>First Page</h1>
+    <p id="message">Waiting for action...</p>
+    <button onclick="openAndModifySecondPage()">Open Second Page and Modify</button>
+
+    <script>
+        function openAndModifySecondPage() {
+            // Open second page in a new tab
+            const secondWindow = window.open('second.html', '_blank');
+
+            // Wait for second page to load
+            secondWindow.onload = function() {
+                // Modify second page's DOM
+                secondWindow.document.getElementById('content').innerHTML =
+                    'Modified by First Page at ' + new Date().toLocaleTimeString();
+
+                // Send message to second page to confirm modification
+                secondWindow.postMessage('showChanges', window.location.origin);
+
+                // Wait briefly to ensure second page updates are visible
+                setTimeout(() => {
+                    // Return focus to first page
+                    window.focus();
+
+                    // Modify first page's DOM
+                    document.getElementById('message').innerHTML =
+                        'Returned to First Page and modified at ' + new Date().toLocaleTimeString();
+                }, 1000); // 1-second delay to ensure visibility
+            };
+
+            // Listen for confirmation from second page
+            window.addEventListener('message', function(event) {
+                if (event.origin === window.location.origin && event.data === 'changesVisible') {
+                    console.log('Second page confirmed changes are visible');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
