@@ -12,17 +12,6 @@
     <h1>Second Page</h1>
     <p id="content">Initial content on second page</p>
 
-    <script>
-        // Listen for message from first page
-        window.addEventListener('message', function(event) {
-            if (event.origin === window.location.origin && event.data === 'showChanges') {
-                // Ensure DOM changes are visible
-                document.getElementById('content').style.display = 'block';
-
-                // Send confirmation back to first page
-                window.opener.postMessage('changesVisible', window.location.origin);
-            }
-        });
-    </script>
+    <script></script>
 </body>
 </html>
