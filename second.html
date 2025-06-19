@@ -2,16 +2,159 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Second Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Text File</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        #content { color: green; }
+        /* Pop-up container styling */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 1px;
+        }
+
+        .popup {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            padding: 20px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .popup h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .popup input[type="text"] {
+            width: 90%;
+            margin: 0 auto 15px auto;
+            display: block;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            font-size: 1em;
+        }
+
+        .popup button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 1px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .popup button:hover {
+            background: #0056b3;
+        }
+
+        /* Debug button styling */
+        .debug-button {
+            margin-left: 10px;
+            padding: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 1px;
+            cursor: pointer;
+        }
+
+        .debug-button:hover {
+            background: #cc0000;
+        }
     </style>
 </head>
 <body>
-    <h1>Second Page</h1>
-    <p id="content">Initial content on second page</p>
+<h1>Download Text File</h1>
+<button onclick="downloadFile()">Download File</button>
+<button class="debug-button" onclick="showPopup()">Test Pop-up</button>
 
-    <script></script>
+<!-- Pop-up overlay -->
+<div id="popupOverlay" class="popup-overlay">
+    <div class="popup">
+        <h2>Download Failed</h2>
+        <p>Please enter text below:</p>
+        <input type="text" id="userInput" placeholder="Enter your text here...">
+        <button onclick="saveText()">Save</button>
+    </div>
+</div>
+
+<script>
+  // Function to attempt file download
+  async function downloadFile() {
+    const url = 'https://example.com/nonexistent-file.txt'; // Replace with your actual URL
+    try {
+      const response = await fetch(url, { method: 'GET' });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const text = await response.text();
+      console.log('Downloaded text:', text);
+    } catch (error) {
+      console.error('Download failed:', error.message);
+      showPopup();
+    }
+  }
+
+  // Show the pop-up
+  function showPopup() {
+    const popup = document.getElementById('popupOverlay');
+    if (popup) {
+      popup.style.display = 'flex';
+    } else {
+      console.error('Pop-up overlay not found');
+    }
+  }
+
+  // Hide the pop-up
+  function hidePopup() {
+    const popup = document.getElementById('popupOverlay');
+    if (popup) {
+      popup.style.display = 'none';
+      document.getElementById('userInput').value = ''; // Clear input
+    }
+  }
+
+  // Save the text from the pop-up
+  function saveText() {
+    const text = document.getElementById('userInput').value;
+    if (text.trim()) {
+      // Create a blob and trigger download
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'user_input.txt';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      // Hide the pop-up
+      hidePopup();
+    } else {
+      alert('Please enter some text before saving.');
+    }
+  }
+
+  // Add event listener for 'Esc' key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      hidePopup();
+    }
+  });
+</script>
 </body>
 </html>

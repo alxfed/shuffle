@@ -17,13 +17,13 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            border-radius: 5px; /* Added border-radius to overlay */
+            border-radius: 1px;
         }
 
         .popup {
             background: white;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 1px;
             padding: 20px;
             width: 400px;
             max-width: 90%;
@@ -37,13 +37,13 @@
         }
 
         .popup textarea {
-            width: 90%; /* Adjusted to center textarea */
-            margin: 0 auto 15px auto; /* Centered with auto margins */
-            display: block; /* Ensures block-level centering */
+            width: 90%;
+            margin: 0 auto 15px auto;
+            display: block;
             height: 100px;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 3px;
+            border-radius: 1px;
             resize: vertical;
         }
 
@@ -52,7 +52,7 @@
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 1px;
             cursor: pointer;
             font-size: 1em;
         }
@@ -81,22 +81,35 @@
   async function downloadFile() {
     const url = 'https://example.com/nonexistent-file.txt'; // Replace with your actual URL
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { method: 'GET' });
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const text = await response.text();
-      // Process the downloaded text (e.g., display or save it)
       console.log('Downloaded text:', text);
     } catch (error) {
-      console.error('Download failed:', error);
+      console.error('Download failed:', error.message);
       showPopup();
     }
   }
 
   // Show the pop-up
   function showPopup() {
-    document.getElementById('popupOverlay').style.display = 'flex';
+    const popup = document.getElementById('popupOverlay');
+    if (popup) {
+      popup.style.display = 'flex';
+    } else {
+      console.error('Pop-up overlay not found');
+    }
+  }
+
+  // Hide the pop-up
+  function hidePopup() {
+    const popup = document.getElementById('popupOverlay');
+    if (popup) {
+      popup.style.display = 'none';
+      document.getElementById('userInput').value = ''; // Clear textarea
+    }
   }
 
   // Save the text from the pop-up
@@ -115,12 +128,18 @@
       document.body.removeChild(a);
 
       // Hide the pop-up
-      document.getElementById('popupOverlay').style.display = 'none';
-      document.getElementById('userInput').value = ''; // Clear textarea
+      hidePopup();
     } else {
       alert('Please enter some text before saving.');
     }
   }
+
+  // Add event listener for 'Esc' key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      hidePopup();
+    }
+  });
 </script>
 </body>
 </html>
